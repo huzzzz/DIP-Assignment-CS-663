@@ -16,7 +16,6 @@ function [modified_pic] = myHM(original_pic,ref_pic)
 		prob = pic_cdf(chan+1);
 		[abc,ind_mat] = arrayfun(@(x) min(abs(ref_cdf-x)),prob);
 		modified_pic(:,:,i) = double(ind_mat)/255.0;
-		disp('Done');
 	end
 	% for i=1:num_chan
 	% 	chan = original_pic(:,:,i);
