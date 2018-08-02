@@ -1,5 +1,6 @@
 function [modified_pic] = myCLAHE(original_pic,kernel_size,threshold)
 	% Contrast Limited Adaptive Histogram Equalization %
+	threshold = threshold * kernel_size * kernel_size;
 	[h, w, num_chan] = size(original_pic);
 	modified_pic = zeros([h, w, num_chan]);
 	kernel = [kernel_size,kernel_size];
@@ -19,6 +20,5 @@ function [modified_pic] = myCLAHE(original_pic,kernel_size,threshold)
 				modified_pic(j,k,i) = pic_cdf(original_pic(j,k,i)+1);
 			end
 		end
-		disp('Done')
 	end
 end

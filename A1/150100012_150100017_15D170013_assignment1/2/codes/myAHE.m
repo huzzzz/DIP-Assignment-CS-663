@@ -14,6 +14,5 @@ function [modified_pic] = myAHE(original_pic,kernel_size)
 				modified_pic(j,k,i) = pic_cdf(original_pic(j,k,i)+1);
 			end
 		end
-		disp('Done')
 	end
 end
