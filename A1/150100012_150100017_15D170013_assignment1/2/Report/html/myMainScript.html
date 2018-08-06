@@ -75,7 +75,7 @@ table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px soli
 
 
 <h2 id="2">Linear Contrast Stretching</h2>
-	<h3>Formula applied for Linear Contrast Stretching:</h3>
+	<h3>Formula applied for Linear Contrast Stretching:</h3><pre class="codeinput" > I_new(x,y) = (I_old(x,y) - min(I_old)) / (max(I_old) - min(I_old))</pre>
 	<img vspace="5" hspace="5" src="barbara.png" alt=""> 
 	<img vspace="3" hspace="3" src="Part2_a_1.png" alt=""> 
 	<img vspace="5" hspace="5" src="TEM.png" alt="">
@@ -84,7 +84,7 @@ table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px soli
 	<img vspace="5" hspace="5" src="Part2_a_3.png" alt="">  
 	<img vspace="5" hspace="5" src="church.png" alt="">
 	<img vspace="5" hspace="5" src="Part2_a_5.png" alt=""> 
-	<h3>Observations for Image(5):</h3>
+	<pre class="codeinput"><h3>Observations for Image(5): </h3>There isn't much change. Linear Contrast stretching is not effective here as for every channel, <br>the minimum (0) and maximum (255) pixel intensities are already present and hence linear mapping does not result in any change according to the formula</pre>
   
 <h2 id="3">Histogram Equalization</h2>
   
@@ -96,14 +96,14 @@ table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px soli
 	<img vspace="5" hspace="5" src="Part2_b_3.png" alt="">  
 	<img vspace="5" hspace="5" src="church.png" alt="">
 	<img vspace="5" hspace="5" src="Part2_b_5.png" alt=""> 
-	<h3>Observations for image(5):</h3>
+	<pre class="codeinput"><h3>Observations for image(5):</h3>There is a noticeable change in the contrast of the image. <br>We can clearly see the parts in new image which were underlit in the original image and hence we would prefer Histogram Equalization for this image</pre>
 
 <h2 id="4">Histogram Matching</h2>
 	<img vspace="5" hspace="5" src="retina.png" alt=""> 
 	<img vspace="3" hspace="3" src="Part2_c.png" alt="">
 	<img vspace="3" hspace="3" src="Part2_c_2.png" alt="">
 	<img vspace="3" hspace="3" src="retinaRef.png" alt="">
-	<h3>Observations: </h3>
+	<pre class="codeinput"><h3>Observations: </h3> Histogram Equalization done on different chaannels leads to an image in which the blue channel gets visibly more enhanced. Since in Histogram matching as we are matching the image with a reference image, the reddish colour of the new image is retained </pre>
 
 <h2 id="5">Adaptive Histogram Equalization</h2>
 	<img vspace="5" hspace="5" src="barbara.png" alt=""> <!-- 10, 200, 500 --> 
