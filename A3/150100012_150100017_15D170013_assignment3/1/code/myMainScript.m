@@ -14,14 +14,14 @@ boat_pic = boat_data.imageOrig;
 
 tic;
 
-patch_gaussian_sigma = 0.8;
+patch_gaussian_sigma = 1;
 k = 0.2;
 
 original_pic = boat_pic;
 original_pic_old = myLinearContrastStretching(original_pic);
 
 
-filter_sigma = 0.8;
+filter_sigma = 0.64;
 filter_size = double(int16(int16(2*filter_sigma)/2)*2 + 3);
 smooth_gauss = fspecial('gaussian',filter_size,filter_sigma);
 original_pic = imfilter(original_pic_old,smooth_gauss);
@@ -33,15 +33,15 @@ savefig3(my_color_scale,original_pic,Eigen_1,Eigen_2,'Eigen 1','Eigen 2','Part1_
 savefig(my_color_scale,original_pic,Cornerness,'Cornerness','Part1_a_corner.png',0,to_save);
 
 % % Uncomment the following lines along with uncommenting the extra part in the myHarrisCornerDetector.m for visualizing the corner points%
-% [h,w,num_chan] = size(original_pic);
-% new_img = zeros([h,w,3]);
-% for i=1:3
-% 	new_img(:,:,i) = original_pic_old;
-% end
-% corner_points = zeros([h,w,3]);
-% corner_points(:,:,1) = modified_pic;
+[h,w,num_chan] = size(original_pic);
+new_img = zeros([h,w,3]);
+for i=1:3
+	new_img(:,:,i) = original_pic_old;
+end
+corner_points = zeros([h,w,3]);
+corner_points(:,:,2) = modified_pic;
 
-% imagesc(new_img+corner_points);
+savefig1(my_color_scale,new_img+corner_points,'Corners Displayed in Green','Part1_a_cornersDisplay.png',0,to_save);
 
 toc;
 
@@ -62,7 +62,7 @@ function [modified_pic] = myLinearContrastStretching(original_pic)
 end
 
 
-% Helper function to display and save processed images %
+% Helper function   to display and save processed images %
 function savefig(my_color_scale,original_pic,modified_pic,title_name,file_name,is_color,to_save)
 	if to_save==1
 		fig = figure('units','normalized','outerposition',[0 0 1 1]); colormap(my_color_scale);
@@ -78,6 +78,28 @@ function savefig(my_color_scale,original_pic,modified_pic,title_name,file_name,i
 	
 	subplot(1,2,1), imagesc(original_pic), title('Original Image'), colorbar, daspect([1 1 1]), axis tight;
 	subplot(1,2,2), imagesc(modified_pic), title(title_name), colorbar, daspect([1 1 1]), axis tight;
+	impixelinfo();
+    
+	if to_save == 1
+		saveas(fig,file_name),close(fig);
+	end
+end
+
+% Helper function   to display and save processed images %
+function savefig1(my_color_scale,modified_pic,title_name,file_name,is_color,to_save)
+	if to_save==1
+		fig = figure('units','normalized','outerposition',[0 0 1 1]); colormap(my_color_scale);
+	else
+		fig = figure; colormap(my_color_scale);
+	end
+
+	if is_color == 1
+		colormap jet;
+	else
+		colormap(gray);
+	end
+	
+	subplot(1,1,1), imagesc(modified_pic), title(title_name), colorbar, daspect([1 1 1]), axis tight;
 	impixelinfo();
     
 	if to_save == 1

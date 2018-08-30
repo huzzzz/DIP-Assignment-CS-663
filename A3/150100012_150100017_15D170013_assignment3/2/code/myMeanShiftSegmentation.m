@@ -1,7 +1,7 @@
 function [modified_pic] = myMeanShiftSegmentation(original_pic,h_color,h_spatial,num_iter)
 	% Mean Shift Segmentation %
 
-	lr = 1;
+	lr = 1.2;
 	[h,w,num_chan] = size(original_pic);	
 	[X,Y] = meshgrid(1:h,1:w);
 
@@ -13,9 +13,12 @@ function [modified_pic] = myMeanShiftSegmentation(original_pic,h_color,h_spatial
 
 	for i=1:num_iter
 		tic;
+		if i == num_iter/2
+			lr = lr/2;
+		end
 		i
 		% No. of neighbours %
-		k = 1000;
+		k = 1200;
 
 		nn_pixels_ind = knnsearch(hyper_dim_pic,hyper_dim_pic,'K',k);
 
@@ -23,14 +26,16 @@ function [modified_pic] = myMeanShiftSegmentation(original_pic,h_color,h_spatial
 			grad = calc_grad(hyper_dim_pic(j,:),hyper_dim_pic(nn_pixels_ind(j,:),:),h_color,h_spatial);
 			hyper_dim_pic(j,:) = hyper_dim_pic(j,:) + lr*grad;
 		end
+
+		temp_pic = hyper_dim_pic(:,1:num_chan);
+		c = size(unique(uint8(temp_pic*256),'rows'));
+		disp(c);
 		toc;
 	end
 	
 	temp_pic = hyper_dim_pic(:,1:num_chan);
-	% c = size(unique(temp_pic))
-	% d = size(unique(original_pic))
-	c = size(unique(uint8(temp_pic*256),'rows'))
-	d = size(unique(uint8(original_pic*256),'rows'))
+	% c = size(unique(uint8(temp_pic*256),'rows'))
+	d = size(unique(uint8(reshape(original_pic, h*w, num_chan)*256),'rows'))
 	modified_pic = reshape(temp_pic,h,w,num_chan);
 
 end

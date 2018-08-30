@@ -36,9 +36,9 @@ end
 
 original_pic = intermediate_pic;
 
-% Parameters for the mean shift segmentation %
-h_color = 0.1;
-h_spatial = 16;
+% Parameters for the mean shift segmentation lr=1, color=0.05/0.03, spatial = 100%
+h_color = 0.03;
+h_spatial = 220;
 num_iter = 20;
 
 modified_pic = myMeanShiftSegmentation(original_pic,h_color,h_spatial,num_iter);

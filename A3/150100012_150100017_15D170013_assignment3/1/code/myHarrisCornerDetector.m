@@ -32,8 +32,10 @@ function [modified_pic, Cornerness, Eigen_1, Eigen_2, I_x, I_y] = myHarrisCorner
 	Eigen_2 = (Trace - sqrt(Trace.^2 - 4*Determinant))/2;
 
 	Cornerness = Determinant - k*(Trace.^2);
+	modified_pic = Cornerness;
 
-	% Extra Part, not asked in the assignment, for visualization purposes %
+	% % Extra Part, not asked in the assignment, for visualization purposes %
+	
 	modified_pic = max(0,Cornerness);
 	non_max_supp = ordfilt2(modified_pic,9,ones(3,3));
 	
