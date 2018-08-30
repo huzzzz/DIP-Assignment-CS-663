@@ -1,2 +1,0 @@
-Two parts of the problem statement are in their respective folders and along with the code in the code folders, we have submitted the zipped folder of all the generated images
-To run the programs, just run the mainscripts in their respective parts
