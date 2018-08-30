@@ -9,55 +9,40 @@ my_color_scale = [col_scale,col_scale,col_scale];
 to_save = 0;
 
 % Loading the pictures %
-boat_data = load('../data/boat.mat');
-boat_pic = boat_data.imageOrig;
+baboon_pic = imread('../data/baboonColor.png');
 
 tic;
-%% Your code here
 
-% k = 0.1 %
+original_pic = baboon_pic;
+original_pic = myLinearContrastStretching(original_pic);
 
-patch_gaussian_sigma = 0.8;
-k = 0.2;
-
-original_pic = boat_pic;
-original_pic_old = myLinearContrastStretching(original_pic);
-
-
-filter_sigma = 0.8;
-filter_size = double(int16(int16(2*filter_sigma)/2)*2 + 3);
+% Defining noise filter and its parameters %
+filter_sigma = 1;
+filter_size = 3;
 smooth_gauss = fspecial('gaussian',filter_size,filter_sigma);
-original_pic = imfilter(original_pic_old,smooth_gauss);
-
-[modified_pic, Cornerness, Eigen_1, Eigen_2, I_x, I_y] = myHarrisCornerDetector(original_pic,patch_gaussian_sigma,k);
-
-% savefig3(my_color_scale,original_pic,Eigen_1,Eigen_2,'Eigen 1','Eigen 2','Part1_a_eigen.png',0,to_save);
-% savefig3(my_color_scale,original_pic,I_x,I_y,'Gradient X','Gradient Y','Part1_a_gradient.png',0,to_save);
-% savefig(my_color_scale,original_pic,Cornerness,'Cornerness','Part1_a_corner.png',0,to_save);
-
-% savefig(my_color_scale,original_pic,I_x,'X Gradient','Part1_a_x.png',0,to_save);
-% savefig(my_color_scale,original_pic,I_y,'Y gradient','Part1_a_y.png',0,to_save);
-% savefig(my_color_scale,original_pic,Eigen_1,'Eigen 1','Part1_a_e1.png',0,to_save);
-% savefig(my_color_scale,original_pic,Eigen_2,'Eigen 2','Part1_a_e2.png',0,to_save);
-
-
 [h,w,num_chan] = size(original_pic);
-new_img = zeros([h,w,3]);
-for i=1:3
-	new_img(:,:,i) = original_pic_old;
+
+% Filtering the image with the formed Gaussian filter %
+for i=1:num_chan
+	original_pic(:,:,i) = imfilter(original_pic(:,:,i),smooth_gauss);
 end
-corner_points = zeros([h,w,3]);
-corner_points(:,:,1) = modified_pic;
 
-imagesc(new_img+corner_points);
-% fig = figure('units','normalized','outerposition',[0 0 1 1]); colormap(my_color_scale);
-% [row, col] = find(modified_pic);
+% Subsampling the image %
+D=2;
+intermediate_pic = zeros([h/D, w/D, num_chan]);
+for i=1:num_chan
+	intermediate_pic(:,:,i) = original_pic(1:D:end,1:D:end,i);
+end
 
-% imagesc(new_img), daspect([1 1 1]), axis tight;
-% hold on;
-% plot(row, col, 'r*');
+original_pic = intermediate_pic;
 
-% savefig(my_color_scale,original_pic_old,modified_pic,'Corner points','Part1_a_final.png',0,to_save);
+% Parameters for the mean shift segmentation %
+h_color = 0.1;
+h_spatial = 16;
+num_iter = 20;
+
+modified_pic = myMeanShiftSegmentation(original_pic,h_color,h_spatial,num_iter);
+savefig(my_color_scale,original_pic,modified_pic,'Segmented Image','Part2_a_segments.png',1,to_save);
 
 toc;
 
@@ -76,7 +61,6 @@ function [modified_pic] = myLinearContrastStretching(original_pic)
 		modified_pic(:,:,i) = double(chan-min_val)./double(max_val-min_val);
 	end 
 end
-
 
 % Helper function to display and save processed images %
 function savefig(my_color_scale,original_pic,modified_pic,title_name,file_name,is_color,to_save)
