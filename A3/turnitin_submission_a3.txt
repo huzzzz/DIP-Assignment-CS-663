@@ -1,0 +1,377 @@
+function [modified_pic, Cornerness, Eigen_1, Eigen_2, I_x, I_y] = myHarrisCornerDetector(original_pic,patch_gaussian_sigma,k)
+	% Harris Corner Detection %
+	
+	% Defining the masks %
+	sobel_mask = fspecial('sobel');
+	prewitt_mask = fspecial('prewitt');
+	
+	custom_mask_x = [0,0,0;-1,0,1;0,0,0];
+	custom_mask_y = custom_mask_x';
+
+	gradient_mask_x = sobel_mask';
+	gradient_mask_y = sobel_mask;
+
+	I_x = imfilter(original_pic,gradient_mask_x);
+	I_y = imfilter(original_pic,gradient_mask_y);
+	
+	I_x2 = I_x.*I_x;
+	I_y2 = I_y.*I_y;
+	I_xy = I_y.*I_x;
+
+	patch_size = double(int16(int16(2*patch_gaussian_sigma)/2)*2 + 3);
+	patch_gaussian_filter = fspecial('gaussian',patch_size,patch_gaussian_sigma);
+	
+	A_11 = imfilter(I_x2,patch_gaussian_filter);
+	A_22 = imfilter(I_y2,patch_gaussian_filter);
+	A_12 = imfilter(I_xy,patch_gaussian_filter);
+
+	Trace = A_11 + A_22;
+	Determinant = A_11.*A_22 - A_12.*A_12;
+
+	Eigen_1 = (Trace + sqrt(Trace.^2 - 4*Determinant))/2;
+	Eigen_2 = (Trace - sqrt(Trace.^2 - 4*Determinant))/2;
+
+	Cornerness = Determinant - k*(Trace.^2);
+	modified_pic = Cornerness;
+
+	% % Extra Part, not asked in the assignment, for visualization purposes %
+	
+	modified_pic = max(0,Cornerness);
+	non_max_supp = ordfilt2(modified_pic,9,ones(3,3));
+	
+	mask = (non_max_supp == modified_pic);
+	modified_pic = mask .* modified_pic	;
+	threshold = 0.0001;
+	modified_pic = modified_pic>threshold;
+
+end%% MyMainScript
+
+% Setting the color scale %
+my_num_of_colors = 256;
+col_scale =  [0:1/(my_num_of_colors-1):1]';
+my_color_scale = [col_scale,col_scale,col_scale];
+
+% Set to_save to 1, if you want to save the generated pictures %
+to_save = 0;
+
+% Loading the pictures %
+boat_data = load('../data/boat.mat');
+boat_pic = boat_data.imageOrig;
+
+tic;
+
+patch_gaussian_sigma = 1;
+k = 0.2;
+
+original_pic = boat_pic;
+original_pic_old = myLinearContrastStretching(original_pic);
+
+
+filter_sigma = 0.64;
+filter_size = double(int16(int16(2*filter_sigma)/2)*2 + 3);
+smooth_gauss = fspecial('gaussian',filter_size,filter_sigma);
+original_pic = imfilter(original_pic_old,smooth_gauss);
+
+[modified_pic, Cornerness, Eigen_1, Eigen_2, I_x, I_y] = myHarrisCornerDetector(original_pic,patch_gaussian_sigma,k);
+
+savefig3(my_color_scale,original_pic,I_x,I_y,'Gradient X','Gradient Y','Part1_a_gradient.png',0,to_save);
+savefig3(my_color_scale,original_pic,Eigen_1,Eigen_2,'Eigen 1','Eigen 2','Part1_a_eigen.png',0,to_save);
+savefig(my_color_scale,original_pic,Cornerness,'Cornerness','Part1_a_corner.png',0,to_save);
+
+% % Uncomment the following lines along with uncommenting the extra part in the myHarrisCornerDetector.m for visualizing the corner points%
+[h,w,num_chan] = size(original_pic);
+new_img = zeros([h,w,3]);
+for i=1:3
+	new_img(:,:,i) = original_pic_old;
+end
+corner_points = zeros([h,w,3]);
+corner_points(:,:,2) = modified_pic;
+
+savefig1(my_color_scale,new_img+corner_points,'Corners Displayed in Green','Part1_a_cornersDisplay.png',0,to_save);
+
+toc;
+
+% Linear Contrast Stretching helper function %
+function [modified_pic] = myLinearContrastStretching(original_pic)
+	% Linear contrast stretching %
+	[h, w, num_chan] = size(original_pic);
+	modified_pic = zeros([h, w, num_chan]);
+	% Running over all channels %
+	for i=1:num_chan
+		chan = original_pic(:,:,i);
+		% Finding the max and min values %
+		max_val = max(chan(:));
+		min_val = min(chan(:));
+		% Linearly stretching the values according to the formula in report %
+		modified_pic(:,:,i) = double(chan-min_val)./double(max_val-min_val);
+	end 
+end
+
+
+% Helper function   to display and save processed images %
+function savefig(my_color_scale,original_pic,modified_pic,title_name,file_name,is_color,to_save)
+	if to_save==1
+		fig = figure('units','normalized','outerposition',[0 0 1 1]); colormap(my_color_scale);
+	else
+		fig = figure; colormap(my_color_scale);
+	end
+
+	if is_color == 1
+		colormap jet;
+	else
+		colormap(gray);
+	end
+	
+	subplot(1,2,1), imagesc(original_pic), title('Original Image'), colorbar, daspect([1 1 1]), axis tight;
+	subplot(1,2,2), imagesc(modified_pic), title(title_name), colorbar, daspect([1 1 1]), axis tight;
+	impixelinfo();
+    
+	if to_save == 1
+		saveas(fig,file_name),close(fig);
+	end
+end
+
+% Helper function   to display and save processed images %
+function savefig1(my_color_scale,modified_pic,title_name,file_name,is_color,to_save)
+	if to_save==1
+		fig = figure('units','normalized','outerposition',[0 0 1 1]); colormap(my_color_scale);
+	else
+		fig = figure; colormap(my_color_scale);
+	end
+
+	if is_color == 1
+		colormap jet;
+	else
+		colormap(gray);
+	end
+	
+	subplot(1,1,1), imagesc(modified_pic), title(title_name), colorbar, daspect([1 1 1]), axis tight;
+	impixelinfo();
+    
+	if to_save == 1
+		saveas(fig,file_name),close(fig);
+	end
+end
+
+% Helper function to display and save 3 processed images %
+function savefig3(my_color_scale,original_pic,mid_pic,modified_pic,mid_name,title_name,file_name,is_color,to_save)
+	if to_save==1
+		fig = figure('units','normalized','outerposition',[0 0 1 1]); colormap(my_color_scale);
+	else
+		fig = figure; colormap(my_color_scale);
+	end
+
+	if is_color == 1
+		colormap jet;
+	else
+		colormap(gray);
+	end
+	
+	subplot(1,3,1), imagesc(original_pic), title('Original Image'), colorbar, daspect([1 1 1]), axis tight;
+	subplot(1,3,2), imagesc(mid_pic), title(mid_name), colorbar, daspect([1 1 1]), axis tight;
+	subplot(1,3,3), imagesc(modified_pic), title(title_name), colorbar, daspect([1 1 1]), axis tight;
+	impixelinfo();
+    
+	if to_save == 1
+		saveas(fig,file_name),close(fig);
+	end
+end
+%% MyMainScript
+
+% Setting the color scale %
+my_num_of_colors = 256;
+col_scale =  [0:1/(my_num_of_colors-1):1]';
+my_color_scale = [col_scale,col_scale,col_scale];
+
+% Set to_save to 1, if you want to save the generated pictures %
+to_save = 0;
+
+% Loading the pictures %
+baboon_pic = imread('../data/baboonColor.png');
+
+tic;
+
+original_pic = baboon_pic;
+original_pic = myLinearContrastStretching(original_pic);
+
+% Defining noise filter and its parameters %
+filter_sigma = 1;
+filter_size = 3;
+smooth_gauss = fspecial('gaussian',filter_size,filter_sigma);
+[h,w,num_chan] = size(original_pic);
+
+% Filtering the image with the formed Gaussian filter %
+for i=1:num_chan
+	original_pic(:,:,i) = imfilter(original_pic(:,:,i),smooth_gauss);
+end
+
+% Subsampling the image %
+D=2;
+intermediate_pic = zeros([h/D, w/D, num_chan]);
+for i=1:num_chan
+	intermediate_pic(:,:,i) = original_pic(1:D:end,1:D:end,i);
+end
+
+original_pic = intermediate_pic;
+
+% Parameters for the mean shift segmentation lr=1, color=0.05/0.03, spatial = 100%
+h_color = 0.03;
+h_spatial = 220;
+num_iter = 20;
+
+modified_pic = myMeanShiftSegmentation(original_pic,h_color,h_spatial,num_iter);
+savefig(my_color_scale,original_pic,modified_pic,'Segmented Image','Part2_a_segments.png',1,to_save);
+
+toc;
+
+% Linear Contrast Stretching helper function %
+function [modified_pic] = myLinearContrastStretching(original_pic)
+	% Linear contrast stretching %
+	[h, w, num_chan] = size(original_pic);
+	modified_pic = zeros([h, w, num_chan]);
+	% Running over all channels %
+	for i=1:num_chan
+		chan = original_pic(:,:,i);
+		% Finding the max and min values %
+		max_val = max(chan(:));
+		min_val = min(chan(:));
+		% Linearly stretching the values according to the formula in report %
+		modified_pic(:,:,i) = double(chan-min_val)./double(max_val-min_val);
+	end 
+end
+
+% Helper function to display and save processed images %
+function savefig(my_color_scale,original_pic,modified_pic,title_name,file_name,is_color,to_save)
+	if to_save==1
+		fig = figure('units','normalized','outerposition',[0 0 1 1]); colormap(my_color_scale);
+	else
+		fig = figure; colormap(my_color_scale);
+	end
+
+	if is_color == 1
+		colormap jet;
+	else
+		colormap(gray);
+	end
+	
+	subplot(1,2,1), imagesc(original_pic), title('Original Image'), colorbar, daspect([1 1 1]), axis tight;
+	subplot(1,2,2), imagesc(modified_pic), title(title_name), colorbar, daspect([1 1 1]), axis tight;
+	impixelinfo();
+    
+	if to_save == 1
+		saveas(fig,file_name),close(fig);
+	end
+end
+
+% Helper function to display and save 3 processed images %
+function savefig3(my_color_scale,original_pic,mid_pic,modified_pic,mid_name,title_name,file_name,is_color,to_save)
+	if to_save==1
+		fig = figure('units','normalized','outerposition',[0 0 1 1]); colormap(my_color_scale);
+	else
+		fig = figure; colormap(my_color_scale);
+	end
+
+	if is_color == 1
+		colormap jet;
+	else
+		colormap(gray);
+	end
+	
+	subplot(1,3,1), imagesc(original_pic), title('Original Image'), colorbar, daspect([1 1 1]), axis tight;
+	subplot(1,3,2), imagesc(mid_pic), title(mid_name), colorbar, daspect([1 1 1]), axis tight;
+	subplot(1,3,3), imagesc(modified_pic), title(title_name), colorbar, daspect([1 1 1]), axis tight;
+    
+	if to_save == 1
+		saveas(fig,file_name),close(fig);
+	end
+endfunction [modified_pic] = myMeanShiftSegmentation(original_pic,h_color,h_spatial,num_iter)
+	% Mean Shift Segmentation %
+
+	lr = 1.2;
+	[h,w,num_chan] = size(original_pic);	
+	[X,Y] = meshgrid(1:h,1:w);
+
+	hyper_dim_pic = original_pic;
+	hyper_dim_pic(:,:,num_chan+1) = X';
+	hyper_dim_pic(:,:,num_chan+2) = Y';
+
+	hyper_dim_pic = reshape(hyper_dim_pic, h*w, num_chan+2);
+
+	for i=1:num_iter
+		tic;
+		if i == num_iter/2
+			lr = lr/2;
+		end
+		i
+		% No. of neighbours %
+		k = 1200;
+
+		nn_pixels_ind = knnsearch(hyper_dim_pic,hyper_dim_pic,'K',k);
+
+		for j=1:h*w
+			grad = calc_grad(hyper_dim_pic(j,:),hyper_dim_pic(nn_pixels_ind(j,:),:),h_color,h_spatial);
+			hyper_dim_pic(j,:) = hyper_dim_pic(j,:) + lr*grad;
+		end
+
+		% temp_pic = hyper_dim_pic(:,1:num_chan);
+		temp_pic = hyper_dim_pic;
+		temp_pic(:,4:5) = hyper_dim_pic(:,4:5);
+		temp_pic(:,1:3) = hyper_dim_pic(:,1:3)*256;
+		c = size(unique(uint16(temp_pic),'rows'));
+		% disp(uint16(temp_pic));
+		% c = size(unique(uint8(temp_pic*256),'rows'));
+		disp(c);
+		toc;
+	end
+	
+	temp_pic = hyper_dim_pic(:,1:num_chan);
+	% c = size(unique(uint8(temp_pic*256),'rows'))
+	modified_pic = reshape(temp_pic,h,w,num_chan);
+
+end
+
+function grad = calc_grad(curr, nbrs, h_color, h_spatial)
+	spatial_diff = nbrs(:,end-1:end)-curr(end-1:end);
+	spatial_diff_sq = sum(spatial_diff.^2,2);
+	weight_space = gaussmf(spatial_diff_sq,[h_spatial 0]);
+
+	color_diff = nbrs(:,1:end-2)-curr(1:end-2);
+	color_diff_sq = sum(color_diff.^2,2);
+	weight_color = gaussmf(color_diff_sq,[h_color 0]);
+
+	weight = weight_color .* weight_space;
+
+	grad = sum(nbrs.*repmat(weight,1,size(nbrs,2)))/sum(weight) - curr;
+
+end
+
+
+Report : Part 1 : Assignment 3
+1)
+Derivative Images ​ :2)
+Eigenvalues Images for the Structured Tensor​ :3) ​ Cornerness Measure Image​ :
+The points having cornerness measure greater than 0(Corners) and those having close to 0 (Non special
+points) cannot be distinguished using the above plot due to the huge range in the negative values side. And the
+ones having high negative values show edges. i.e. the edges are dark in the pic. The points having cornerness as
+0(most of the points) are attributed a whitish color which looks similar to the positive cornerness points, thus
+making it difficult to distinguish the corners from the rest. This is the reason to include the extra pic having
+highlighted Green values showing the points with positive cornerness (greater than a threshold) in the 5th section
+of the report to show the potential corners clearly.4) ​ Parameters Used :
+Gaussian_Smoothening_Sigma : 0.64
+Patch_gaussian_sigma (For making patch isotropic) : 1
+k (Constant for Cornerness Measure) = 0.2;
+Threshold for showing corners = 10​ -45) Corners Displayed in Green :
+We have marked the points identified as corners by making their Green component = 1.
+
+
+Report : Part 2 : Assignment 3
+Parameters Used:
+Gaussian Kernel bandwidth for the color feature = 0.03 (For Colors scaled between 0 and 1)
+Gaussian Kernel bandwidth for the spatial feature = 220 (For 256x256 images)
+Number of iterations = 20
+Learning rate = 1.2 if current iterations < 10 else 0.6
+Nearest neighbours (using knnsearch()) for calculating gradient = 1200
+The number of segments obtained using the above parameters is 46. The measure used to
+calculate the number of segments is that of distinct 5 tuples (colors, space). We have used an
+adaptive learning rate to ascent quickly for half the iterations and then halving the initial learning
+rate
