@@ -1,0 +1,37 @@
+%% MyMainScript
+
+tic;
+%% Your code here>
+
+database_dir = '../../../../att_faces/';
+
+train_x = zeros(32 * 6, 110*92);
+test_x = zeros(32 * 4, 92*110);
+
+size(train
+train_index = 1;
+test_index = 1;
+
+for person = 1 : 32
+	curr_person_dir = strcat(database_dir, 's', int2str(person));
+    for sample = 1 : 10        
+        file_name = strcat(curr_person_dir,'/', int2str(sample), '.pgm');
+        temp_im = imread(file_name);
+        resized_temp_im = temp_im(:);
+        if (sample > 6)
+            train_x(train_index) = resized_temp_im;
+            train_index = train_index + 1;
+        else
+            size(test_x(test_index))
+            size(resized_temp_im)
+            disp(test_index)
+        	test_x(test_index) = resized_temp_im;
+            test_index = test_index + 1;
+        end
+    end 
+end
+
+size(test_x)
+size(train_x)
+
+toc;
