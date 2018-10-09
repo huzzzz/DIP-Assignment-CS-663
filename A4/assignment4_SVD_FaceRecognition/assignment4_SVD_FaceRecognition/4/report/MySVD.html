@@ -6,7 +6,7 @@
    <!--
 This HTML was auto-generated from MATLAB code.
 To make changes, update the MATLAB code and republish this document.
-      --><title>MySVD</title><meta name="generator" content="MATLAB 9.4"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2018-10-08"><meta name="DC.source" content="MySVD.m"><style type="text/css">
+      --><title>MySVD</title><meta name="generator" content="MATLAB 9.4"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2018-10-09"><meta name="DC.source" content="MySVD.m"><style type="text/css">
 html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
 
 html { min-height:100%; margin-bottom:1px; }
@@ -68,22 +68,23 @@ table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px soli
 
   </style></head><body><div class="content"><pre class="codeinput"><span class="keyword">function</span> [U,S,V] = MySVD(A)
 
+    [m, n] = size(A);
+
 	<span class="comment">% eigs gives eigenvalues in sorted order</span>
 
 	<span class="comment">% get left singular vectors of A.</span>
 	<span class="comment">% AA' = (USV') (VS'U') = US(VV')S'U' = USS'U' = USSU'. Hence U is eigenvector matrix of AA'</span>
-	[U,~] = eigs( A * A' );
+	[U,~] = eigs( A * A', m );
 
 	<span class="comment">% get right singular vectors of A</span>
 	<span class="comment">% A'A = (VS'U') (USV') = VS'(U'U)SV' = VS'SV' = VS'SV'. Hence V is eigenvector matrix of A'A</span>
-	[V,~] = eigs( A' * A );
+	[V,~] = eigs( A' * A, n );
 
 	<span class="comment">% Since U and V are orthornormal, U' * (U*S*V') * V = S</span>
 	S = U' * A * V;
 
 	<span class="comment">% But we need only non-negative values on diagonal for S</span>
 	<span class="comment">% So we adjust S and U to maintain consistency. Negating does not affect the orthonormality of U</span>
-    [m,n] = size(S);
     <span class="keyword">for</span> d=1:min(m,n)
     	<span class="keyword">if</span>(S(d,d)&lt;0)
     		U(:,d) = -U(:,d);
@@ -95,23 +96,24 @@ table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px soli
 </pre><p class="footer"><br><a href="https://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2018a</a><br></p></div><!--
 ##### SOURCE BEGIN #####
 function [U,S,V] = MySVD(A)
+    
+    [m, n] = size(A);
 
 	% eigs gives eigenvalues in sorted order
 
 	% get left singular vectors of A. 
 	% AA' = (USV') (VS'U') = US(VV')S'U' = USS'U' = USSU'. Hence U is eigenvector matrix of AA'
-	[U,~] = eigs( A * A' );
+	[U,~] = eigs( A * A', m );
 
 	% get right singular vectors of A
 	% A'A = (VS'U') (USV') = VS'(U'U)SV' = VS'SV' = VS'SV'. Hence V is eigenvector matrix of A'A
-	[V,~] = eigs( A' * A );
+	[V,~] = eigs( A' * A, n );
 
 	% Since U and V are orthornormal, U' * (U*S*V') * V = S 
 	S = U' * A * V;
 
 	% But we need only non-negative values on diagonal for S
 	% So we adjust S and U to maintain consistency. Negating does not affect the orthonormality of U
-    [m,n] = size(S);
     for d=1:min(m,n)
     	if(S(d,d)<0)
     		U(:,d) = -U(:,d);
