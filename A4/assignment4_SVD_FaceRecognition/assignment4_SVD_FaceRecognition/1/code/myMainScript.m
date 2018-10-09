@@ -1,6 +1,5 @@
 %% MyMainScript
 
-
 disp('Starting experiment using the att_faces database using eig function');
 
 tic;
