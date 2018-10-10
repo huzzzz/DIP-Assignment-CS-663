@@ -1,5 +1,3 @@
-disp('Starting experiment using the att_faces database using eig function');
-
 tic;
 
 database_dir = '../../../../att_faces/';
@@ -57,16 +55,9 @@ mean_vec  = mean_vec';
 train_x = train_x - mean_vec;
 test_x = test_x - mean_vec;
 
-L = train_x' * train_x;
-
-[eig_vecs_L, eig_vals_L] = eigs(L, num_persons * num_train_per_person);
-
-eig_vecs_C = train_x * eig_vecs_L;
-
-diag_norm = diag(sqrt(eig_vecs_C' * eig_vecs_C));
-divide_mat_norms = repmat(diag_norm', [im_h*im_w, 1]);
-
-norm_eig_vecs_C = eig_vecs_C ./ divide_mat_norms;
+tic;
+norm_eig_vecs_C =  pca_eig(train_x, num_persons, num_train_per_person, im_h, im_w);
+toc;
 
 k_test = 100;
 
@@ -107,6 +98,11 @@ disp(false_neg);
 
 disp('False Positives : ');
 disp(false_pos);
-% recog_rates
+
+disp('False Negatives Rate : ');
+disp(false_neg / (num_test_per_person*(num_persons+num_persons_test)));
+
+disp('False Positives Rate : ');
+disp(false_pos / (num_test_per_person*(num_persons+num_persons_test)));
 
 toc;
