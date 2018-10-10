@@ -1,6 +1,5 @@
 %% MyMainScript
 
-
 disp('Starting experiment using the att_faces');
 
 %Prepare data for the algorithm
