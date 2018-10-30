@@ -1,0 +1,191 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>MyMainScript</title><meta name="generator" content="MATLAB 9.4"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2018-10-28"><meta name="DC.source" content="myMainScript.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img, h1 img, h2 img { margin-bottom:0px; } 
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, code { font-size:12px; }
+tt { font-size: 1.2em; }
+pre { margin:0px 0px 20px; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+pre.error { color:red; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+.footer a { color:#878787; }
+.footer a:hover { color:#878787; text-decoration:underline; }
+.footer a:visited { color:#878787; }
+
+table th { padding:7px 5px; text-align:left; vertical-align:middle; border: 1px solid #d6d4d4; font-weight:bold; }
+table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px solid #d6d4d4; }
+
+
+
+
+
+  </style></head><body><div class="content"><h1>MyMainScript</h1><!--introduction--><!--/introduction--><h2>Contents</h2><div><ul><li><a href="#1">Setting the color scale</a></li><li><a href="#2">Loading image</a></li><li><a href="#3">Display Log magnitude of Fourier Transform</a></li><li><a href="#4">Applying Ideal Notch Filter to the Fourier transform</a></li><li><a href="#5">Displaying Log magnitude of Fourier Transform after applying Notch Filter</a></li><li><a href="#6">Displaying restored image</a></li><li><a href="#7">Helper function to display and save processed images</a></li></ul></div><h2 id="1">Setting the color scale</h2><pre class="codeinput">my_num_of_colors = 256;
+col_scale =  [0:1/(my_num_of_colors-1):1]';
+my_color_scale = [col_scale,col_scale,col_scale];
+to_save = 0;
+
+tic;
+</pre><h2 id="2">Loading image</h2><pre class="codeinput">original_pic = load(<span class="string">'../../image_low_frequency_noise.mat'</span>);
+original_pic = original_pic.Z;
+</pre><h2 id="3">Display Log magnitude of Fourier Transform</h2><pre class="codeinput">fft_pic = fftshift(fft2(original_pic));
+log_fft_pic = log(abs(fft_pic)+1);
+imshow(log_fft_pic,[-2 18]);
+title(<span class="string">'Log magnitude of Fourier Transform'</span>);
+colormap(jet); colorbar; impixelinfo();
+snapnow;
+</pre><img vspace="5" hspace="5" src="myMainScript_01.png" alt=""> <h2 id="4">Applying Ideal Notch Filter to the Fourier transform</h2><p>Peaks found at (119,124) and (139,134) in the log magnitude of Fourier transform.</p><pre class="codeinput"><span class="keyword">for</span> i = -3:3
+	<span class="keyword">for</span> j = -3:3
+		fft_pic(119+i, 124+j) = 0;
+		fft_pic(139+i, 134+j) = 0;
+	<span class="keyword">end</span>
+<span class="keyword">end</span>
+</pre><h2 id="5">Displaying Log magnitude of Fourier Transform after applying Notch Filter</h2><pre class="codeinput">log_fft_pic = log(abs(fft_pic)+1);
+imshow(log_fft_pic,[-2 18]);
+title(<span class="string">'FFT After applying Notch Filter'</span>);
+colormap(jet); colorbar; impixelinfo();
+snapnow;
+</pre><img vspace="5" hspace="5" src="myMainScript_02.png" alt=""> <h2 id="6">Displaying restored image</h2><pre class="codeinput">modified_pic = ifft2(ifftshift(fft_pic));
+savefig(my_color_scale,original_pic,modified_pic,<span class="string">'Notch Filtered Image'</span>,<span class="string">'../notch_filtered_image.png'</span>,0,to_save);
+
+toc;
+</pre><h2 id="7">Helper function to display and save processed images</h2><pre class="codeinput"><span class="keyword">function</span> savefig(my_color_scale,original_pic,modified_pic,title_name,file_name,is_color,to_save)
+	<span class="keyword">if</span> to_save==1
+		fig = figure(<span class="string">'units'</span>,<span class="string">'normalized'</span>,<span class="string">'outerposition'</span>,[0 0 1 1]); colormap(my_color_scale);
+	<span class="keyword">else</span>
+		fig = figure; colormap(my_color_scale);
+	<span class="keyword">end</span>
+
+	<span class="keyword">if</span> is_color == 1
+		colormap <span class="string">jet</span>;
+	<span class="keyword">else</span>
+		colormap(gray);
+	<span class="keyword">end</span>
+
+	subplot(1,2,1), imagesc(original_pic), title(<span class="string">'Original Image'</span>), colorbar, daspect([1 1 1]), axis <span class="string">tight</span>;
+	subplot(1,2,2), imagesc(modified_pic), title(title_name), colorbar, daspect([1 1 1]), axis <span class="string">tight</span>;
+	impixelinfo();
+
+	<span class="keyword">if</span> to_save == 1
+		saveas(fig,file_name),close(fig);
+	<span class="keyword">end</span>
+<span class="keyword">end</span>
+</pre><pre class="codeoutput">Elapsed time is 1.357992 seconds.
+</pre><img vspace="5" hspace="5" src="myMainScript_03.png" alt=""> <p class="footer"><br><a href="https://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2018a</a><br></p></div><!--
+##### SOURCE BEGIN #####
+%% MyMainScript
+
+%% Setting the color scale
+my_num_of_colors = 256;
+col_scale =  [0:1/(my_num_of_colors-1):1]';
+my_color_scale = [col_scale,col_scale,col_scale];
+to_save = 0;
+
+tic;
+
+%% Loading image
+original_pic = load('../../image_low_frequency_noise.mat');
+original_pic = original_pic.Z;
+
+%% Display Log magnitude of Fourier Transform
+fft_pic = fftshift(fft2(original_pic));
+log_fft_pic = log(abs(fft_pic)+1);
+imshow(log_fft_pic,[-2 18]);
+title('Log magnitude of Fourier Transform');
+colormap(jet); colorbar; impixelinfo();
+snapnow;
+
+%% Applying Ideal Notch Filter to the Fourier transform
+% Peaks found at (119,124) and (139,134) in the log magnitude of Fourier transform.
+for i = -3:3
+	for j = -3:3
+		fft_pic(119+i, 124+j) = 0;
+		fft_pic(139+i, 134+j) = 0;
+	end
+end
+
+%% Displaying Log magnitude of Fourier Transform after applying Notch Filter
+log_fft_pic = log(abs(fft_pic)+1);
+imshow(log_fft_pic,[-2 18]);
+title('FFT After applying Notch Filter');
+colormap(jet); colorbar; impixelinfo();
+snapnow;
+
+%% Displaying restored image
+modified_pic = ifft2(ifftshift(fft_pic));
+savefig(my_color_scale,original_pic,modified_pic,'Notch Filtered Image','../notch_filtered_image.png',0,to_save);
+
+toc;
+
+
+%% Helper function to display and save processed images
+function savefig(my_color_scale,original_pic,modified_pic,title_name,file_name,is_color,to_save)
+	if to_save==1
+		fig = figure('units','normalized','outerposition',[0 0 1 1]); colormap(my_color_scale);
+	else
+		fig = figure; colormap(my_color_scale);
+	end
+
+	if is_color == 1
+		colormap jet;
+	else
+		colormap(gray);
+	end
+	
+	subplot(1,2,1), imagesc(original_pic), title('Original Image'), colorbar, daspect([1 1 1]), axis tight;
+	subplot(1,2,2), imagesc(modified_pic), title(title_name), colorbar, daspect([1 1 1]), axis tight;
+	impixelinfo();
+    
+	if to_save == 1
+		saveas(fig,file_name),close(fig);
+	end
+end
+
+##### SOURCE END #####
+--></body></html>
