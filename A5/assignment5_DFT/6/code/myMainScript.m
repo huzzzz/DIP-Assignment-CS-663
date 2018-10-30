@@ -23,26 +23,25 @@ fft_I = fftshift(fft2(I));
 fft_J = fftshift(fft2(J));
 
 cross_power_spectrum = (fft_I .* conj(fft_J))./abs(fft_I .* fft_J);
+cross_power_spectrum(isnan(cross_power_spectrum)) = 1;
 
 log_cps = log(abs(cross_power_spectrum)+1);
 final_pic = abs(ifft2(ifftshift(cross_power_spectrum)));
 
 savefig(my_color_scale,log_cps,final_pic,'final_pic','../images/notch_filtered_image.png',0,to_save);
-toc;
 
 %% Gaussian Noise added
-I = I + 20*randn(size(I));
-J = J + 20*randn(size(J));
+% I = I + 20*randn(size(I));
+% J = J + 20*randn(size(J));
 
-fft_I = fftshift(fft2(I));
-fft_J = fftshift(fft2(J));
+% fft_I = fftshift(fft2(I));
+% fft_J = fftshift(fft2(J));
 
-cross_power_spectrum = (fft_I .* conj(fft_J)) ./ abs(fft_I .* fft_J);
+% cross_power_spectrum = (fft_I .* conj(fft_J)) ./ abs(fft_I .* fft_J);
+% log_cps = log(abs(cross_power_spectrum)+1);
+% final_pic = ifft2(ifftshift(cross_power_spectrum));
 
-log_cps = log(abs(cross_power_spectrum)+1);
-final_pic = ifft2(ifftshift(cross_power_spectrum));
-
-savefig(my_color_scale,log_cps,final_pic,'final_pic','../images/notch_filtered_image.png',0,to_save);
+% savefig(my_color_scale,log_cps,final_pic,'final_pic','../images/notch_filtered_image.png',0,to_save);
 toc;
 
 %% Helper function to display and save processed images
