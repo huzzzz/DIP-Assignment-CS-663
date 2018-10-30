@@ -1,0 +1,227 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>myMainScript</title><meta name="generator" content="MATLAB 9.4"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2018-10-31"><meta name="DC.source" content="myMainScript.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img, h1 img, h2 img { margin-bottom:0px; } 
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, code { font-size:12px; }
+tt { font-size: 1.2em; }
+pre { margin:0px 0px 20px; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+pre.error { color:red; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+.footer a { color:#878787; }
+.footer a:hover { color:#878787; text-decoration:underline; }
+.footer a:visited { color:#878787; }
+
+table th { padding:7px 5px; text-align:left; vertical-align:middle; border: 1px solid #d6d4d4; font-weight:bold; }
+table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px solid #d6d4d4; }
+
+
+
+
+
+  </style></head><body><div class="content"><h2>Contents</h2><div><ul><li><a href="#1">MyMainScript</a></li><li><a href="#2">Setting the color scale</a></li><li><a href="#3">Part 1</a></li><li><a href="#4">Gaussian Noise added</a></li><li><a href="#5">Questions:</a></li><li><a href="#6">Helper function to display and save processed images</a></li></ul></div><h2 id="1">MyMainScript</h2><pre class="codeinput">tic;
+</pre><h2 id="2">Setting the color scale</h2><pre class="codeinput">my_num_of_colors = 256;
+col_scale =  [0:1/(my_num_of_colors-1):1]';
+my_color_scale = [col_scale,col_scale,col_scale];
+to_save = 1;
+
+[x,y] = deal(50,50);
+[l,b] = deal(50,70);
+[t_x,t_y] = deal(-30,70);
+
+I = zeros([300 300]);
+J = zeros([300 300]);
+
+I(y:y+b-1,x:x+l-1) = 255;
+J(y+t_y:y+t_y+b-1,x+t_x:x+t_x+l-1) = 255;
+</pre><h2 id="3">Part 1</h2><pre class="codeinput">fft_I = fftshift(fft2(I));
+fft_J = fftshift(fft2(J));
+
+cross_power_spectrum = (fft_I .* conj(fft_J))./abs(fft_I .* fft_J);
+cross_power_spectrum(isnan(cross_power_spectrum)) = 1;
+
+log_cps = log(abs(cross_power_spectrum)+1);
+final_pic = ifft2(ifftshift(cross_power_spectrum));
+
+savefig(my_color_scale,log_cps,final_pic,<span class="string">'Displacement'</span>,<span class="string">'../images/displacement.png'</span>,0,to_save);
+
+<img vspace="5" hspace="5" src="myMainScript_01.png" alt="">
+
+<span class="comment">Comment: As we can see using impixelinfo, there is a single impulse at (31,231). This is exactly what is expected!</span>
+<span class="comment">We should have got an impulse at (p,q) when the translated image is of the form f(x-p, y-q).</span>
+<span class="comment">In our case, the translated image is of the form f(x-30, y+70), hence an impulse is expected at p=30 and q=-70(As fft is periodic, -70 =&gt; 300-70 =&gt;230)</span>
+<span class="comment">Since the origin is (1,1), we expected the impulse at (31,231)</span>
+</pre><h2 id="4">Gaussian Noise added</h2><pre class="codeinput">I = I + 20*randn(size(I));
+J = J + 20*randn(size(J));
+
+fft_I = fftshift(fft2(I));
+fft_J = fftshift(fft2(J));
+
+cross_power_spectrum = (fft_I .* conj(fft_J)) ./ abs(fft_I .* fft_J);
+log_cps = log(abs(cross_power_spectrum)+1);
+final_pic = ifft2(ifftshift(cross_power_spectrum));
+
+savefig(my_color_scale,log_cps,final_pic,<span class="string">'Displacement with Gaussian Noise'</span>,<span class="string">'../images/displacement-with-gaussian-noise'</span>,0,to_save);
+toc;
+<img vspace="5" hspace="5" src="myMainScript_02.png" alt="">
+<span class="comment">Comment: In case of Gaussian noise, it's not a single impulse. Rather it is spread along the axes and is decreasing (Magnitude is highest at (31,231) )</span>
+</pre><h2 id="5">Questions:</h2><pre class="codeinput"><span class="comment">1. Time complexity for NxN image: O(N^2 * log(N)). Since computation of 2D-DFT is O(N^2 * log(N)) and other operations are of the form O(N^2)</span>
+
+<span class="comment">2. Time complexity of a Naive Pixel-wise image comparison procedure: Number of possible displacements * Number of pixels = N^2(Comparable to Image dimensions) * N^2 = O(N^4)</span>
+<span class="comment">Comment: Hence the Cross Power Spectrum is orders of magnitude faster.</span>
+</pre><h2 id="6">Helper function to display and save processed images</h2><pre class="codeinput"><span class="keyword">function</span> savefig(my_color_scale,original_pic,modified_pic,title_name,file_name,is_color,to_save)
+	<span class="keyword">if</span> to_save==1
+		fig = figure(<span class="string">'units'</span>,<span class="string">'normalized'</span>,<span class="string">'outerposition'</span>,[0 0 1 1]); colormap(my_color_scale);
+	<span class="keyword">else</span>
+		fig = figure; colormap(my_color_scale);
+	<span class="keyword">end</span>
+
+	<span class="keyword">if</span> is_color == 1
+		colormap <span class="string">jet</span>;
+	<span class="keyword">else</span>
+		colormap(gray);
+	<span class="keyword">end</span>
+
+	subplot(1,2,1), imagesc(original_pic), title(<span class="string">'Log of Fourier magnitude of CPS'</span>), colorbar, daspect([1 1 1]), axis <span class="string">tight</span>;
+	subplot(1,2,2), imagesc(modified_pic), title(title_name), colorbar, daspect([1 1 1]), axis <span class="string">tight</span>;
+	impixelinfo();snapnow;
+
+	<span class="keyword">if</span> to_save == 1
+		saveas(fig,file_name),close(fig);
+	<span class="keyword">end</span>
+<span class="keyword">end</span>
+</pre> <pre class="codeoutput">Elapsed time is 3.823626 seconds.
+</pre><p class="footer"><br><a href="https://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2018a</a><br></p></div><!--
+##### SOURCE BEGIN #####
+%% MyMainScript
+
+tic;
+
+%% Setting the color scale
+my_num_of_colors = 256;
+col_scale =  [0:1/(my_num_of_colors-1):1]';
+my_color_scale = [col_scale,col_scale,col_scale];
+to_save = 1;
+
+[x,y] = deal(50,50);
+[l,b] = deal(50,70);
+[t_x,t_y] = deal(-30,70);
+
+I = zeros([300 300]);
+J = zeros([300 300]);
+
+I(y:y+b-1,x:x+l-1) = 255;
+J(y+t_y:y+t_y+b-1,x+t_x:x+t_x+l-1) = 255;
+
+%% Part 1
+fft_I = fftshift(fft2(I));
+fft_J = fftshift(fft2(J));
+
+cross_power_spectrum = (fft_I .* conj(fft_J))./abs(fft_I .* fft_J);
+cross_power_spectrum(isnan(cross_power_spectrum)) = 1;
+
+log_cps = log(abs(cross_power_spectrum)+1);
+final_pic = ifft2(ifftshift(cross_power_spectrum));
+
+savefig(my_color_scale,log_cps,final_pic,'Displacement','../images/displacement.png',0,to_save);
+
+% Comment: As we can see using impixelinfo, there is a single impulse at (31,231). This is exactly what is expected!
+% We should have got an impulse at (p,q) when the translated image is of the form f(x-p, y-q). 
+% In our case, the translated image is of the form f(x-30, y+70), hence an impulse is expected at p=30 and q=-70(As fft is periodic, -70 => 300-70 =>230)
+% Since the origin is (1,1), we expected the impulse at (31,231)
+
+%% Gaussian Noise added
+I = I + 20*randn(size(I));
+J = J + 20*randn(size(J));
+
+fft_I = fftshift(fft2(I));
+fft_J = fftshift(fft2(J));
+
+cross_power_spectrum = (fft_I .* conj(fft_J)) ./ abs(fft_I .* fft_J);
+log_cps = log(abs(cross_power_spectrum)+1);
+final_pic = ifft2(ifftshift(cross_power_spectrum));
+
+savefig(my_color_scale,log_cps,final_pic,'Displacement with Gaussian Noise','../images/displacement-with-gaussian-noise',0,to_save);
+toc;
+
+% Comment: In case of Gaussian noise, it's not a single impulse. Rather it is spread along the axes and is decreasing (Magnitude is highest at (31,231) )
+
+%% Questions:
+
+% 1. Time complexity for NxN image: O(N^2 * log(N)). Since computation of 2D-DFT is O(N^2 * log(N)) and other operations are of the form O(N^2)
+
+% 2. Time complexity of a Naive Pixel-wise image comparison procedure: Number of possible displacements * Number of pixels = N^2(Comparable to Image dimensions) * N^2 = O(N^4)
+% Comment: Hence the Cross Power Spectrum is orders of magnitude faster.
+
+%% Helper function to display and save processed images
+function savefig(my_color_scale,original_pic,modified_pic,title_name,file_name,is_color,to_save)
+	if to_save==1
+		fig = figure('units','normalized','outerposition',[0 0 1 1]); colormap(my_color_scale);
+	else
+		fig = figure; colormap(my_color_scale);
+	end
+
+	if is_color == 1
+		colormap jet;
+	else
+		colormap(gray);
+	end
+	
+	subplot(1,2,1), imagesc(original_pic), title('Log of Fourier magnitude of CPS'), colorbar, daspect([1 1 1]), axis tight;
+	subplot(1,2,2), imagesc(modified_pic), title(title_name), colorbar, daspect([1 1 1]), axis tight;
+	impixelinfo();snapnow;
+    
+	if to_save == 1
+		saveas(fig,file_name),close(fig);
+	end
+end
+
+##### SOURCE END #####
+--></body></html>

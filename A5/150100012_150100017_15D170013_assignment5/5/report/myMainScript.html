@@ -1,0 +1,269 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>MyMainScript</title><meta name="generator" content="MATLAB 9.4"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2018-10-30"><meta name="DC.source" content="myMainScript.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img, h1 img, h2 img { margin-bottom:0px; } 
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, code { font-size:12px; }
+tt { font-size: 1.2em; }
+pre { margin:0px 0px 20px; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+pre.error { color:red; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+.footer a { color:#878787; }
+.footer a:hover { color:#878787; text-decoration:underline; }
+.footer a:visited { color:#878787; }
+
+table th { padding:7px 5px; text-align:left; vertical-align:middle; border: 1px solid #d6d4d4; font-weight:bold; }
+table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px solid #d6d4d4; }
+
+
+
+
+
+  </style></head><body><div class="content"><h1>MyMainScript</h1><!--introduction--><!--/introduction--><h2>Contents</h2><div><ul><li><a href="#1">Setting the color scale</a></li><li><a href="#2">Parameters</a></li><li><a href="#3">Load image and compute fft</a></li><li><a href="#4">PCA Denoising method 1</a></li><li><a href="#5">PCA Denoising method 2</a></li><li><a href="#6">Bilateral Filtering</a></li><li><a href="#7">Comparison between Bilateral Filtering and PCA based denoising</a></li><li><a href="#8">Poisson Noise</a></li><li><a href="#9">Poisson Noise by 20</a></li><li><a href="#10">Explanation: Denoising of Poisson Noise</a></li><li><a href="#11">Helper function to display and save 3 processed images</a></li></ul></div><h2 id="1">Setting the color scale</h2><pre class="codeinput">my_num_of_colors = 256;
+col_scale =  [0:1/(my_num_of_colors-1):1]';
+my_color_scale = [col_scale,col_scale,col_scale];
+to_save = 1;
+</pre><h2 id="2">Parameters</h2><pre class="codeinput">gaussian_sigma = 20;
+patch_size = 7;
+neighborhood_size = 31;
+num_neighbors = 200;
+</pre><h2 id="3">Load image and compute fft</h2><pre class="codeinput">original_pic = double(imread(<span class="string">'../data/barbara256.png'</span>));
+noisy_pic = original_pic + gaussian_sigma*randn(size(original_pic));
+</pre><h2 id="4">PCA Denoising method 1</h2><pre class="codeinput">tic;
+modified_pic = myPCADenoising1(noisy_pic,gaussian_sigma,patch_size);
+fprintf(<span class="string">'Method 1 RMSE: %f\n'</span>, rmse(modified_pic,original_pic));
+savefig3(my_color_scale,original_pic,noisy_pic,modified_pic,<span class="string">'Noisy'</span>,<span class="string">'Method 1 Denoised'</span>,<span class="string">'../images/PCADenoised1.png'</span>,0,to_save)
+toc;
+</pre><pre class="codeoutput">Method 1 RMSE: 0.071535
+</pre><img vspace="5" hspace="5" src="myMainScript_01.png" alt=""> <pre class="codeoutput">Elapsed time is 3.014152 seconds.
+</pre>
+
+<h2 id="5">PCA Denoising method 2</h2><pre class="codeinput">tic;
+modified_pic = myPCADenoising2(noisy_pic,gaussian_sigma,patch_size,neighborhood_size,num_neighbors);
+fprintf(<span class="string">'Method 2 RMSE: %f\n'</span>,rmse(modified_pic,original_pic));
+savefig3(my_color_scale,original_pic,noisy_pic,modified_pic,<span class="string">'Noisy'</span>,<span class="string">'Method 2 Denoised'</span>,<span class="string">'../images/PCADenoised2.png'</span>,0,to_save)
+toc;
+</pre><pre class="codeoutput">Method 2 RMSE: 0.055964
+</pre><img vspace="5" hspace="5" src="myMainScript_02.png" alt=""> <pre class="codeoutput">Elapsed time is 149.750013 seconds.
+</pre><h2 id="6">Bilateral Filtering</h2><pre class="codeinput">tic;
+intensity_limit = [min(min(noisy_pic)),max(max(noisy_pic))];
+intensity_range = intensity_limit(2) - intensity_limit(1);
+spatial_sigma =1.4;
+intensity_sigma = intensity_range*0.1;
+modified_pic = myBilateralFiltering(noisy_pic, spatial_sigma, intensity_sigma);
+fprintf(<span class="string">'Bilateral Filtering RMSE: %f\n'</span>,rmse(modified_pic,original_pic));
+savefig3(my_color_scale,original_pic,noisy_pic,modified_pic,<span class="string">'Noisy'</span>,<span class="string">'Bilateral Denoised'</span>,<span class="string">'../images/Bilateral.png'</span>,0,to_save)
+toc;
+</pre><pre class="codeoutput">Bilateral Filtering RMSE: 0.088766
+</pre><img vspace="5" hspace="5" src="myMainScript_03.png" alt=""> <pre class="codeoutput">Elapsed time is 2.870522 seconds.
+</pre><h2 id="7">Comparison between Bilateral Filtering and PCA based denoising</h2><pre class="codeinput"><span class="comment"> As we can see from the RMSE values and the images, the order in which noise is removed well:</span>
+<span class="comment">					 Windowed PCA (Method 2) &gt; Global PCA (Method 1) &gt; Bilateral Filtering</span>
+<span class="comment"></span>
+<span class="comment"> We also see that Global PCA has better contrast than Bilateral Filtering. Windowed PCA performs the best in noise removal</span>
+<span class="comment"></span>
+<span class="comment"> Differences between PCA based denoising and Bilateral Filtering</span>
+<span class="comment"> 1. PCA method uses the concept of dimensionality reduction whereas bilateral filtering does not</span>
+<span class="comment"> 2. PCA is a model based method (in this case, the noise is assumed to follow gaussian model) whereas bilateral filtering does not assume a model</span>
+<span class="comment"> 3. PCA is a non local method whereas bilateral filtering uses local spatial information</span>
+</pre><h2 id="8">Poisson Noise</h2><pre class="codeinput">tic;
+poisson_noise_pic = poissrnd(original_pic);
+root_noise_pic = sqrt(poisson_noise_pic);
+modified_pic = myPCADenoising2(root_noise_pic,0.5,patch_size,neighborhood_size,num_neighbors);
+modified_pic = modified_pic.^2;
+fprintf(<span class="string">'Poisson Noise RMSE: %f\n'</span>,rmse(modified_pic,original_pic));
+savefig3(my_color_scale,original_pic,root_noise_pic,modified_pic,<span class="string">'Poisson Noisy'</span>,<span class="string">'Denoised'</span>,<span class="string">'../images/Poisson.png'</span>,0,to_save)
+toc;
+</pre><pre class="codeoutput">Poisson Noise RMSE: 0.037861
+</pre><img vspace="5" hspace="5" src="myMainScript_04.png" alt=""> <pre class="codeoutput">Elapsed time is 152.328519 seconds.
+</pre><h2 id="9">Poisson Noise by 20</h2><pre class="codeinput">tic;
+poisson_noise_pic = poissrnd(original_pic/20);
+root_noise_pic = sqrt(poisson_noise_pic);
+modified_pic = myPCADenoising2(root_noise_pic,0.5,patch_size,neighborhood_size,num_neighbors);
+modified_pic = 20 * modified_pic.^2;
+fprintf(<span class="string">'Poisson Noise by 20 RMSE: %f\n'</span>,rmse(modified_pic,original_pic));
+savefig3(my_color_scale,original_pic,root_noise_pic,modified_pic,<span class="string">'Poisson Noisy By 20'</span>,<span class="string">'Denoised'</span>,<span class="string">'../images/PoissonBy20.png'</span>,0,to_save)
+toc;
+</pre><pre class="codeoutput">Poisson Noise by 20 RMSE: 0.119899
+</pre>
+<img vspace="5" hspace="5" src="myMainScript_05.png" alt=""> <pre class="codeoutput">Elapsed time is 150.439046 seconds.
+</pre>
+
+<h2 id="10">Explanation: Denoising of Poisson Noise</h2><p>How does the result of this compare with the earlier case? =&gt; The image is not denoised well when the exposure time is low (im/20)</p><p>Why? =&gt; Since we are dividing by 20, the value of I decreases (i.e. lambda for Poisson noise decreases) and hence the Anscombe transform does not give a good approximation to a Gaussian.    As we are using the Windowed PCA method for denoising (assuming additive Gaussian zero mean noise), the method does not perform as well as intended.</p><h2 id="11">Helper function to display and save 3 processed images</h2><pre class="codeinput"><span class="keyword">function</span> savefig3(my_color_scale,original_pic,mid_pic,modified_pic,mid_name,title_name,file_name,is_color,to_save)
+	<span class="keyword">if</span> to_save==1
+		fig = figure(<span class="string">'units'</span>,<span class="string">'normalized'</span>,<span class="string">'outerposition'</span>,[0 0 1 1]); colormap(my_color_scale);
+	<span class="keyword">else</span>
+		fig = figure; colormap(my_color_scale);
+	<span class="keyword">end</span>
+
+	<span class="keyword">if</span> is_color == 1
+		colormap <span class="string">jet</span>;
+	<span class="keyword">else</span>
+		colormap(gray);
+	<span class="keyword">end</span>
+
+	subplot(1,3,1), imagesc(original_pic), title(<span class="string">'Original Image'</span>), colorbar, daspect([1 1 1]), axis <span class="string">tight</span>;
+	subplot(1,3,2), imagesc(mid_pic), title(mid_name), colorbar, daspect([1 1 1]), axis <span class="string">tight</span>;
+	subplot(1,3,3), imagesc(modified_pic), title(title_name), colorbar, daspect([1 1 1]), axis <span class="string">tight</span>;
+    snapnow;
+	<span class="keyword">if</span> to_save == 1
+		saveas(fig,file_name),close(fig);
+	<span class="keyword">end</span>
+<span class="keyword">end</span>
+</pre><p class="footer"><br><a href="https://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2018a</a><br></p></div><!--
+##### SOURCE BEGIN #####
+%% MyMainScript
+
+%% Setting the color scale
+my_num_of_colors = 256;
+col_scale =  [0:1/(my_num_of_colors-1):1]';
+my_color_scale = [col_scale,col_scale,col_scale];
+to_save = 1;
+
+%% Parameters
+gaussian_sigma = 20;
+patch_size = 7;
+neighborhood_size = 31;
+num_neighbors = 200;
+
+%% Load image and compute fft
+original_pic = double(imread('../data/barbara256.png'));
+noisy_pic = original_pic + gaussian_sigma*randn(size(original_pic));
+
+%% PCA Denoising method 1
+tic;
+modified_pic = myPCADenoising1(noisy_pic,gaussian_sigma,patch_size);
+fprintf('Method 1 RMSE: %f\n', rmse(modified_pic,original_pic));
+savefig3(my_color_scale,original_pic,noisy_pic,modified_pic,'Noisy','Method 1 Denoised','../images/PCADenoised1.png',0,to_save)
+toc;
+
+%% PCA Denoising method 2
+tic;
+modified_pic = myPCADenoising2(noisy_pic,gaussian_sigma,patch_size,neighborhood_size,num_neighbors);
+fprintf('Method 2 RMSE: %f\n',rmse(modified_pic,original_pic));
+savefig3(my_color_scale,original_pic,noisy_pic,modified_pic,'Noisy','Method 2 Denoised','../images/PCADenoised2.png',0,to_save)
+toc;
+
+%% Bilateral Filtering
+tic;
+intensity_limit = [min(min(noisy_pic)),max(max(noisy_pic))];
+intensity_range = intensity_limit(2) - intensity_limit(1);
+spatial_sigma =1.4;
+intensity_sigma = intensity_range*0.1;
+modified_pic = myBilateralFiltering(noisy_pic, spatial_sigma, intensity_sigma);
+fprintf('Bilateral Filtering RMSE: %f\n',rmse(modified_pic,original_pic));
+savefig3(my_color_scale,original_pic,noisy_pic,modified_pic,'Noisy','Bilateral Denoised','../images/Bilateral.png',0,to_save)
+toc;
+
+%% Comparison between Bilateral Filtering and PCA based denoising
+
+% As we can see from the RMSE values and the images, the order in which noise is removed well:
+%					 Windowed PCA (Method 2) > Global PCA (Method 1) > Bilateral Filtering 
+%
+% We also see that Global PCA has better contrast than Bilateral Filtering. Windowed PCA performs the best in noise removal
+%
+% Differences between PCA based denoising and Bilateral Filtering
+% 1. PCA method uses the concept of dimensionality reduction whereas bilateral filtering does not
+% 2. PCA is a model based method (in this case, the noise is assumed to follow gaussian model) whereas bilateral filtering does not assume a model
+% 3. PCA is a non local method whereas bilateral filtering uses local spatial information
+
+%% Poisson Noise
+tic;
+poisson_noise_pic = poissrnd(original_pic);
+root_noise_pic = sqrt(poisson_noise_pic);
+modified_pic = myPCADenoising2(root_noise_pic,0.5,patch_size,neighborhood_size,num_neighbors);
+modified_pic = modified_pic.^2;
+fprintf('Poisson Noise RMSE: %f\n',rmse(modified_pic,original_pic));
+savefig3(my_color_scale,original_pic,root_noise_pic,modified_pic,'Poisson Noisy','Denoised','../images/Poisson.png',0,to_save)
+toc;
+
+%% Poisson Noise by 20
+tic;
+poisson_noise_pic = poissrnd(original_pic/20);
+root_noise_pic = sqrt(poisson_noise_pic);
+modified_pic = myPCADenoising2(root_noise_pic,0.5,patch_size,neighborhood_size,num_neighbors);
+modified_pic = 20 * modified_pic.^2;
+fprintf('Poisson Noise by 20 RMSE: %f\n',rmse(modified_pic,original_pic));
+savefig3(my_color_scale,original_pic,root_noise_pic,modified_pic,'Poisson Noisy By 20','Denoised','../images/PoissonBy20.png',0,to_save)
+toc;
+
+%% Explanation: Denoising of Poisson Noise 
+%
+% How does the result of this compare with the earlier case? 
+% => The image is not denoised well when the exposure time is low (im/20)
+%
+% Why?
+% => Since we are dividing by 20, the value of I decreases (i.e. lambda for Poisson noise decreases) and hence the Anscombe transform does not give a good approximation to a Gaussian.
+%    As we are using the Windowed PCA method for denoising (assuming additive Gaussian zero mean noise), the method does not perform as well as intended.
+
+
+%% Helper function to display and save 3 processed images
+function savefig3(my_color_scale,original_pic,mid_pic,modified_pic,mid_name,title_name,file_name,is_color,to_save)
+	if to_save==1
+		fig = figure('units','normalized','outerposition',[0 0 1 1]); colormap(my_color_scale);
+	else
+		fig = figure; colormap(my_color_scale);
+	end
+
+	if is_color == 1
+		colormap jet;
+	else
+		colormap(gray);
+	end
+	
+	subplot(1,3,1), imagesc(original_pic), title('Original Image'), colorbar, daspect([1 1 1]), axis tight;
+	subplot(1,3,2), imagesc(mid_pic), title(mid_name), colorbar, daspect([1 1 1]), axis tight;
+	subplot(1,3,3), imagesc(modified_pic), title(title_name), colorbar, daspect([1 1 1]), axis tight;
+    snapnow;
+	if to_save == 1
+		saveas(fig,file_name),close(fig);
+	end
+end
+##### SOURCE END #####
+--></body></html>
